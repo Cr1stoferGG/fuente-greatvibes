@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Te amo 💖</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: black;
+      font-family: 'Great Vibes', cursive;
+    }
+    #audioStart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2em;
+      color: white;
+      background-color: rgba(255, 20, 147, 0.8);
+      padding: 1em 2em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 10;
+      font-family: 'Great Vibes', cursive;
+    }
+  </style>
+  <!-- Fuente desde Google Fonts solo para el botón -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <button id="audioStart">Dale click amor 💖</button>
+  <audio id="audio" src="https://cr1stofergg.github.io/fuente-greatvibes/amor.mp3" preload="auto" loop></audio>
+
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js';
+    import { FontLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/FontLoader.js';
+    import { TextGeometry } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/geometries/TextGeometry.js';
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    camera.position.z = 20;
+
+    // Fondo de estrellas
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 1000;
+    const starPositions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount * 3; i++) {
+      starPositions[i] = (Math.random() - 0.5) * 200;
+    }
+    starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    const starMaterial = new THREE.PointsMaterial({ color: 0xffffff });
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    scene.add(stars);
+
+    const loader = new FontLoader();
+    loader.load('https://cr1stofergg.github.io/fuente-greatvibes/greatvibes_regular.typeface.json', font => {
+      const messages = [
+        'Te amo mucho',
+        'Eres mi universo',
+        'Tu sonrisa ilumina todo',
+        'Contigo todo es mejor',
+        'Siempre juntos 💖'
+      ];
+
+      messages.forEach((text, i) => {
+        const geometry = new TextGeometry(text, {
+          font: font,
+          size: 2,
+          height: 0.5,
+          curveSegments: 12,
+          bevelEnabled: true,
+          bevelThickness: 0.03,
+          bevelSize: 0.02,
+          bevelOffset: 0,
+          bevelSegments: 5
+        });
+
+        geometry.center();
+
+        const material = new THREE.MeshPhongMaterial({ color: 0xff69b4, shininess: 100 });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.y = (messages.length - 1 - i) * 4 - 8;
+        scene.add(mesh);
+      });
+    });
+
+    const light = new THREE.PointLight(0xffffff, 1);
+    light.position.set(10, 10, 10);
+    scene.add(light);
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+      stars.rotation.y += 0.0005;
+      renderer.render(scene, camera);
+    };
+    animate();
+
+    // Reproducción de audio con manejo de error
+    const audio = document.getElementById('audio');
+    const button = document.getElementById('audioStart');
+
+    button.addEventListener('click', async () => {
+      try {
+        await audio.play();
+        button.style.display = 'none';
+      } catch (e) {
+        alert('Tu navegador bloqueó el audio. Intenta hacer clic de nuevo.');
+        console.error('Error al reproducir el audio:', e);
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth/window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
